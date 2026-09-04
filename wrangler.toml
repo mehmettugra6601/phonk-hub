@@ -1,0 +1,6 @@
+name = "phonkhub"
+compatibility_date = "2024-01-01"
+
+# Statik dosyalar için Pages yapılandırması
+[site]
+bucket = "./"
