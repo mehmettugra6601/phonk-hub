@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonkHub · iTunes + YouTube Full Track</title>
+    
+    <!-- PH FAVICON - Turuncu zemin, siyah PH -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ff9900'/%3E%3Ctext x='32' y='44' font-family='Arial, Helvetica, sans-serif' font-size='30' font-weight='900' text-anchor='middle' fill='%23000000'%3EPH%3C/text%3E%3C/svg%3E">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Oswald:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #050508;
+            --ph-orange: #ff9900;
+            --ph-orange-glow: rgba(255, 153, 0, 0.4);
+            --yt-red: #ff0000;
+            --yt-red-glow: rgba(255, 0, 0, 0.4);
+            --apple-purple: #fc3c44;
+            --glass-bg: rgba(18, 18, 24, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f0f0f5;
+            --text-muted: #8e8e9e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, #151522 0%, #050508 80%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 0 1rem 120px 1rem;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .logo-box {
+            background: var(--ph-orange);
+            color: #000;
+            padding: 0 16px;
+            border-radius: 12px;
+            margin-left: 10px;
+            box-shadow: 0 0 35px var(--ph-orange-glow);
+        }
+
+        .source-badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-itunes {
+            background: rgba(252, 60, 68, 0.15);
+            color: var(--apple-purple);
+        }
+
+        .badge-youtube {
+            background: rgba(255, 0, 0, 0.15);
+            color: var(--yt-red);
+        }
+
+        .search-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(16px);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(10, 10, 15, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--ph-orange);
+            box-shadow: 0 0 20px var(--ph-orange-glow);
+        }
+
+        .search-btn {
+            background: var(--ph-orange);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .search-btn:hover {
+            background: #ffaa00;
+            box-shadow: 0 0 20px var(--ph-orange-glow);
+            transform: translateY(-2px);
+        }
+
+        .track-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .track-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .track-card:hover {
+            border-color: var(--ph-orange);
+            box-shadow: 0 10px 30px rgba(255, 153, 0, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .track-card.playing {
+            border-color: var(--yt-red);
+            box-shadow: 0 0 40px var(--yt-red-glow);
+            background: rgba(255, 0, 0, 0.05);
+        }
+
+        .track-cover-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #1a1a24;
+        }
+
+        .track-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .track-cover-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .play-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: var(--yt-red);
+            color: #fff;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 0 20px var(--yt-red-glow);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .track-card:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .track-card.playing .play-overlay {
+            opacity: 1;
+        }
+
+        .track-info {
+            padding: 1rem;
+        }
+
+        .track-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-artist {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .track-sources {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .source-tag {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .tag-itunes {
+            background: rgba(252, 60, 68, 0.2);
+            color: var(--apple-purple);
+        }
+
+        .tag-youtube {
+            background: rgba(255, 0, 0, 0.2);
+            color: var(--yt-red);
+        }
+
+        .sticky-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 16, 0.98);
+            border-top: 2px solid var(--yt-red);
+            padding: 12px 20px;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(20px);
+        }
+
+        .sticky-player.active {
+            display: flex;
+        }
+
+        .player-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #1a1a24;
+        }
+
+        .player-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .player-btn {
+            background: var(--yt-red);
+            color: #fff;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px var(--yt-red-glow);
+            flex-shrink: 0;
+        }
+
+        .player-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .player-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-status {
+            font-size: 0.75rem;
+            color: var(--yt-red);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--glass-border);
+            border-top-color: var(--ph-orange);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.15);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .status-message {
+            background: rgba(255, 153, 0, 0.15);
+            border: 1px solid rgba(255, 153, 0, 0.3);
+            color: var(--ph-orange);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        #yt-player-container {
+            position: fixed;
+            bottom: -200px;
+            right: -200px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .logo { font-size: 2.5rem; }
+            .track-grid { grid-template-columns: 1fr; }
+            .sticky-player { flex-wrap: wrap; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content-wrapper">
+        <header>
+            <div class="logo">Phonk<span class="logo-box">Hub</span></div>
+            <div class="source-badges">
+                <span class="source-badge badge-itunes">🍎 iTunes Metadata</span>
+                <span class="source-badge badge-youtube">▶ YouTube Full Audio</span>
+            </div>
+        </header>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="search-input" class="search-input" placeholder="Phonk parçası veya sanatçı ara...">
+                <button class="search-btn" onclick="searchTracks()">🔍 Ara</button>
+            </div>
+            <div class="error-message" id="error-message"></div>
+            <div class="status-message" id="status-message"></div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem; color: #888;">iTunes'dan bilgiler çekiliyor...</p>
+        </div>
+
+        <div class="track-grid" id="track-grid"></div>
+    </div>
+
+    <div class="sticky-player" id="sticky-player">
+        <div class="player-cover" id="player-cover-img">
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🎵</div>
+        </div>
+        <button class="player-btn" id="play-pause-btn" onclick="togglePlayPause()">▶</button>
+        <div class="player-info">
+            <div class="player-title" id="player-title">Şarkı Seçilmedi</div>
+            <div class="player-status">▶ YouTube'dan Tam Parça</div>
+        </div>
+    </div>
+
+    <div id="yt-player-container"></div>
+
+    <script>
+        // ============ YOUTUBE DATA API ANAHTARI ============
+        const YOUTUBE_API_KEY = 'AIzaSyDYGz5cfoNLwg7oQPnz0retRw-NUPHj1BQ';
+
+        // ============ YOUTUBE IFrame API ============
+        const ytTag = document.createElement('script');
+        ytTag.src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(ytTag, firstScriptTag);
+
+        let ytPlayer = null;
+        let currentTrack = null;
+        let currentCard = null;
+        let isPlaying = false;
+
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('yt-player-container', {
+                width: '1',
+                height: '1',
+                playerVars: {
+                    autoplay: 0,
+                    controls: 0,
+                    disablekb: 1,
+                    fs: 0,
+                    iv_load_policy: 3,
+                    modestbranding: 1,
+                    rel: 0,
+                    playsinline: 1
+                },
+                events: {
+                    onReady: () => {
+                        console.log('✅ YouTube Player hazır');
+                    },
+                    onStateChange: (event) => {
+                        if (event.data === YT.PlayerState.ENDED) {
+                            isPlaying = false;
+                            document.getElementById('play-pause-btn').innerText = '▶';
+                            if (currentCard) currentCard.classList.remove('playing');
+                        }
+                        if (event.data === YT.PlayerState.PLAYING) {
+                            isPlaying = true;
+                            document.getElementById('play-pause-btn').innerText = '❚❚';
+                        }
+                        if (event.data === YT.PlayerState.PAUSED) {
+                            isPlaying = false;
+                            document.getElementById('play-pause-btn').innerText = '▶';
+                        }
+                    },
+                    onError: (error) => {
+                        console.error('YouTube player hatası:', error);
+                        showError('Video çalınamadı! Başka bir parça dene.');
+                    }
+                }
+            });
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = '❌ ' + message;
+            errorDiv.classList.add('show');
+            setTimeout(() => errorDiv.classList.remove('show'), 5000);
+        }
+
+        function showStatus(message) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.classList.add('show');
+            setTimeout(() => statusDiv.classList.remove('show'), 3000);
+        }
+
+        // ============ ITUNES ARAMA ============
+        async function searchTracks() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) {
+                showError('Lütfen bir arama terimi girin!');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            loading.classList.add('active');
+
+            try {
+                const itunesResponse = await fetch(
+                    `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=12`
+                );
+
+                if (!itunesResponse.ok) {
+                    throw new Error(`iTunes API hatası: ${itunesResponse.status}`);
+                }
+
+                const itunesData = await itunesResponse.json();
+                
+                if (itunesData.results && itunesData.results.length > 0) {
+                    displayTracks(itunesData.results);
+                    showStatus(`✅ ${itunesData.results.length} parça bulundu`);
+                } else {
+                    showError('Sonuç bulunamadı!');
+                    document.getElementById('track-grid').innerHTML = '';
+                }
+            } catch (error) {
+                console.error('Arama hatası:', error);
+                showError('Arama hatası: ' + error.message);
+            }
+
+            loading.classList.remove('active');
+        }
+
+        function displayTracks(tracks) {
+            const grid = document.getElementById('track-grid');
+            grid.innerHTML = '';
+
+            tracks.forEach((track) => {
+                const card = document.createElement('div');
+                card.className = 'track-card';
+                
+                const coverUrl = track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '300x300') : null;
+
+                card.innerHTML = `
+                    <div class="track-cover-wrapper">
+                        ${coverUrl 
+                            ? `<img src="${coverUrl}" alt="${track.trackName}" class="track-cover">`
+                            : `<div class="track-cover-placeholder">🎵</div>`
+                        }
+                        <div class="play-overlay">▶</div>
+                    </div>
+                    <div class="track-info">
+                        <div class="track-title">${track.trackName}</div>
+                        <div class="track-artist">${track.artistName}</div>
+                        <div class="track-sources">
+                            <span class="source-tag tag-itunes">🍎 iTunes</span>
+                            <span class="source-tag tag-youtube">▶ YouTube Full Audio</span>
+                        </div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => playTrack(track, card));
+                grid.appendChild(card);
+            });
+        }
+
+        // ============ YOUTUBE DATA API İLE ARAMA ============
+        async function searchYouTube(query) {
+            try {
+                const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=3&key=${YOUTUBE_API_KEY}`;
+                
+                const response = await fetch(searchUrl);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`YouTube API hatası: ${errorData.error?.message || response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.items && data.items.length > 0) {
+                    return data.items[0].id.videoId;
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('YouTube arama hatası:', error);
+                showError('YouTube arama hatası: ' + error.message);
+                return null;
+            }
+        }
+
+        // ============ PARÇA ÇALMA ============
+        async function playTrack(track, card) {
+            if (currentCard) {
+                currentCard.classList.remove('playing');
+            }
+
+            card.classList.add('playing');
+            currentCard = card;
+            currentTrack = track;
+
+            const trackName = `${track.trackName} - ${track.artistName}`;
+            
+            document.getElementById('sticky-player').classList.add('active');
+            document.getElementById('player-title').innerText = trackName;
+            
+            const coverContainer = document.getElementById('player-cover-img');
+            if (track.artworkUrl100) {
+                const coverUrl = track.artworkUrl100.replace('100x100', '300x300');
+                coverContainer.innerHTML = `<img src="${coverUrl}" alt="${track.trackName}" style="width:100%;height:100%;object-fit:cover;">`;
+            }
+
+            showStatus('🔍 YouTube\'da aranıyor: ' + trackName);
+
+            const videoId = await searchYouTube(`${track.trackName} ${track.artistName} audio`);
+            
+            if (videoId && ytPlayer) {
+                ytPlayer.loadVideoById(videoId);
+                ytPlayer.playVideo();
+                showStatus('✅ Tam parça çalınıyor (YouTube)');
+                console.log('YouTube video ID:', videoId);
+            } else {
+                showError('YouTube\'da video bulunamadı!');
+            }
+        }
+
+        function togglePlayPause() {
+            if (!ytPlayer) return;
+            
+            if (isPlaying) {
+                ytPlayer.pauseVideo();
+            } else {
+                ytPlayer.playVideo();
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchTracks();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🎵 PhonkHub hazır!');
+            console.log('✅ YouTube API anahtarı yüklendi');
+            console.log('🌐 http://localhost:8080 adresinde çalışıyor');
+            
+            document.getElementById('search-input').value = 'phonk';
+            searchTracks();
+        });
+    </script>
+</body>
+</html>

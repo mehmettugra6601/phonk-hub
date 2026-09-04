@@ -1,0 +1,84 @@
+# ============ BAĞIMLILIKLAR ============
+node_modules/
+vendor/
+bower_components/
+
+# ============ ORTAM DEĞİŞKENLERİ ============
+.env
+.env.local
+.env.production
+.env.development
+.env.*.local
+
+# ============ API ANAHTARLARI ============
+config.js
+config.json
+secrets.js
+secrets.json
+credentials.js
+credentials.json
+api-keys.js
+api-keys.json
+
+# ============ CLOUDFLARE ============
+.wrangler/
+.dev.vars
+wrangler.toml.local
+
+# ============ LOG DOSYALARI ============
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ============ GEÇİCİ DOSYALAR ============
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# ============ EDİTÖR AYARLARI ============
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ============ İŞLETİM SİSTEMİ ============
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+.directory
+.Trash-*
+
+# ============ DERLEME ÇIKTILARI ============
+dist/
+build/
+out/
+*.min.js
+*.min.css
+
+# ============ VERİTABANI ============
+*.sqlite
+*.sqlite3
+*.db
+
+# ============ PAKET YÖNETİCİLERİ ============
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ============ ÖNEMLİ: API ANAHTARININ BULUNDUĞU DOSYA ============
+# Eğer API anahtarını ayrı bir dosyada tutuyorsan:
+api-config.js
+config.local.js
+settings.local.js
